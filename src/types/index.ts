@@ -1,3 +1,5 @@
+import {LoanStatus} from "../schemas/loan.schema";
+
 export type Book = {
     id: string,
     title: string,
@@ -21,5 +23,3 @@ export type Loan = {
     returnDate: Date | null,
     status: LoanStatus
 };
-
-export type LoanStatus = "ACTIVE" | "RETURNED";
