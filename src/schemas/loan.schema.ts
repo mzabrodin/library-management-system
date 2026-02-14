@@ -18,7 +18,7 @@ export const LoanSchema = z.object({
         .nullable()
         .optional(),
 
-    status: loanStatusSchema
+    status: loanStatusSchema.nullable().optional()
 }).refine((data) => {
     if (!data.returnDate || !data.loanDate) {
         return true;
