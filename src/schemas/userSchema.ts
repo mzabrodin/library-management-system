@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-export const UserSchema = z.object({
+export const userSchema = z.object({
     name: z
         .string()
         .trim()
@@ -10,4 +10,4 @@ export const UserSchema = z.object({
     email: z.email({error: "Invalid email address"})
 });
 
-export type UserDto = z.infer<typeof UserSchema>;
+export type UserDto = z.infer<typeof userSchema>;
