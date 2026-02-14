@@ -1,7 +1,7 @@
 import {Book, Loan, User} from "../types";
 
 export const db = {
-    books: Map<string, Book>,
-    users: Map<string, User>,
-    loans: Map<string, Loan>,
+    books: new Map<string, Book>(),
+    users: new Map<string, User>(),
+    loans: new Map<string, Loan>(),
 }
