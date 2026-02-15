@@ -19,6 +19,18 @@ export class BookService {
         return db.books.getAll().some(book => book.isbn === isbn);
     }
 
+    changeAvailability(book: Book, available: boolean): Book {
+        const updatedBook: Book = {
+            ...book,
+            available: available
+        }
+
+        db.books.saveToMap(updatedBook);
+        db.books.saveToFile();
+
+        return updatedBook;
+    }
+
     create(dto: CreateBookDto): Book {
         const id = crypto.randomUUID();
         const book: Book = {
@@ -58,3 +70,5 @@ export class BookService {
     }
 
 }
+
+export const bookService = new BookService();
