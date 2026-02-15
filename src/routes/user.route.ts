@@ -4,12 +4,11 @@ import{userSchema} from "../schemas/userSchema";
 import * as UserController from "../controllers/user.controller";
 
 const router = express.Router();
-const jsonParser = express.json();
 
 router.get("/", UserController.getAllUsers);
 
 router.get("/:id", UserController.getUserById);
 
-router.post("/", jsonParser, validate(userSchema), UserController.createUser);
+router.post("/", validate(userSchema), UserController.createUser);
 
 export default router;
