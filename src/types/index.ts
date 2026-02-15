@@ -1,7 +1,10 @@
 import {LoanStatus} from "../schemas/loan.schema";
 
-export type Book = {
-    id: string,
+export interface Identifiable {
+    id: string
+}
+
+export type Book = Identifiable & {
     title: string,
     author: string,
     year: number,
@@ -9,14 +12,12 @@ export type Book = {
     available: boolean
 };
 
-export type User = {
-    id: string,
+export type User = Identifiable & {
     name: string,
     email: string
 };
 
-export type Loan = {
-    id: string,
+export type Loan = Identifiable & {
     userId: string,
     bookId: string,
     loanDate: Date,
