@@ -34,3 +34,5 @@ export class UserService {
         return user;
     }
 }
+
+export const userService = new UserService();
