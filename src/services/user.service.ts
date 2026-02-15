@@ -1,6 +1,6 @@
 import {db} from "../storage/db";
 import {User} from "../types";
-import {UserDto} from "../schemas/userSchema";
+import {UserDto} from "../schemas/user.schema";
 
 export class UserService {
 

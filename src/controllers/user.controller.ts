@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {db} from "../storage/db";
-import {UserDto} from "../schemas/userSchema";
+import {UserDto} from "../schemas/user.schema";
 import {User} from "../types";
 
 type UserParams = {
