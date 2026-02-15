@@ -52,8 +52,8 @@ export function returnBook(req: Request<LoanParams>, res: Response) {
         return res.status(404).json({error: "Book not found"});
     }
 
-    loanService.return(req.body, loan)
+    const updatedLoan = loanService.return(loan);
     bookService.changeAvailability(book, true);
 
-    res.status(200).json(loan);
+    res.status(200).json(updatedLoan);
 }
