@@ -1,0 +1,18 @@
+[
+  {
+    "id": "0e1a4894-1322-45d5-a692-6199cb98e6bf",
+    "userId": "0a3713c1-83b1-4858-8dab-92904530a964",
+    "bookId": "0b8b3cdc-adae-45c7-b79b-968ad940084a",
+    "loanDate": "2026-02-15T14:02:38.669Z",
+    "returnDate": "2026-02-15T14:25:22.796Z",
+    "status": "RETURNED"
+  },
+  {
+    "id": "24dd599d-4e16-484c-bf15-47f1e7d5524e",
+    "userId": "0a3713c1-83b1-4858-8dab-92904530a964",
+    "bookId": "0b8b3cdc-adae-45c7-b79b-968ad940084a",
+    "loanDate": "2026-02-15T14:25:30.753Z",
+    "returnDate": "2026-02-15T14:35:39.830Z",
+    "status": "RETURNED"
+  }
+]
