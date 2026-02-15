@@ -23,7 +23,7 @@ export class LoanService {
             bookId: book.id,
             loanDate: dto.loanDate || new Date(),
             returnDate: dto.returnDate || null,
-            status: dto.status || "ACTIVE"
+            status: "ACTIVE"
         }
 
         db.loans.saveToMap(loan);
@@ -32,11 +32,11 @@ export class LoanService {
         return loan;
     }
 
-    return(dto: LoanDto, loan: Loan): Loan {
+    return(loan: Loan): Loan {
         const updatedLoan: Loan = {
             ...loan,
-            returnDate: dto.returnDate || new Date(),
-            status: dto.status || "RETURNED"
+            returnDate: new Date(),
+            status: "RETURNED"
         }
 
         db.loans.saveToMap(updatedLoan);
