@@ -1,7 +1,8 @@
 import {Book, Loan, User} from "../types";
+import {JsonStorage} from "./json-storage";
 
 export const db = {
-    books: new Map<string, Book>(),
-    users: new Map<string, User>(),
-    loans: new Map<string, Loan>(),
-}
+    books: new JsonStorage<Book>('books'),
+    users: new JsonStorage<User>('users'),
+    loans: new JsonStorage<Loan>('loans'),
+};
