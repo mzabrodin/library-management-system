@@ -41,3 +41,5 @@ export class LoanService {
         return updatedLoan;
     }
 }
+
+export const loanService = new LoanService();
