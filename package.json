@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.ts",
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev": "nodemon --ignore data/ --exec ts-node src/server.ts",
     "watch": "tsc --watch"
   },
   "author": "Maksym Zabrodin",
