@@ -7,6 +7,10 @@ export class LoanService {
         return db.loans.getAll();
     }
 
+    findById(id: string): Loan | undefined {
+        return db.loans.getById(id);
+    }
+
     existsActiveLoanForBook(bookId: string): boolean {
         return this.findAll().some(loan => loan.bookId === bookId && loan.status === "ACTIVE");
     }
