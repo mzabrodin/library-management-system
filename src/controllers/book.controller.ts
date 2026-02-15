@@ -75,5 +75,5 @@ export function updateBook(req: Request<BookParams, {}, UpdateBookDto>, res: Res
 export function deleteBook(req: Request<BookParams>, res: Response) {
     const id = req.params.id;
     db.books.delete(id);
-    res.status(204)
+    res.status(204).send();
 }
