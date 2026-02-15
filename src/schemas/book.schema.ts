@@ -25,8 +25,7 @@ export const createBookSchema = z.object({
     isbn: z
         .string()
         .trim()
-        .min(10, {error: "ISBN must be at least 10 characters"})
-        .max(13, {error: "ISBN must be at most 13 characters"})
+        .min(1, {error: "ISBN is required"})
         .regex(isbnRegex, {error: "ISBN must be a valid format, digits and hyphens only"}),
 
     available: z.boolean()
