@@ -17,7 +17,7 @@ export class UserService {
     }
 
     existsById(id: string): boolean {
-        return db.users.getById(id) !== undefined;
+        return this.findById(id) !== undefined;
     }
 
     create(dto: UserDto): User {
