@@ -1,20 +1,17 @@
 import {Request, Response} from 'express';
-import {db} from "../storage/db";
 import {UserDto} from "../schemas/user.schema";
-import {User} from "../types";
+import {userService} from "../services/user.service";
 
 type UserParams = {
     id: string;
 }
 
-export function getAllUsers(req: Request, res: Response) {
-    const users = Array.from(db.users.values());
-    res.status(200).json(users);
+export function getAllUsers(_: Request, res: Response) {
+    res.status(200).json(userService.findAll());
 }
 
 export function getUserById(req: Request<UserParams>, res: Response) {
-    const id = req.params.id;
-    const user = db.users.get(id);
+    const user = userService.findById(req.params.id);
 
     if (!user) {
         return res.status(404).json({error: "User not found"});
@@ -24,21 +21,10 @@ export function getUserById(req: Request<UserParams>, res: Response) {
 }
 
 export function createUser(req: Request<{}, {}, UserDto>, res: Response) {
-    const {name, email} = req.body;
-
-    const emailExists = Array.from(db.users.values()).some(user => user.email === email);
-    if (emailExists) {
+    if (userService.existsByEmail(req.body.email)) {
         return res.status(400).json({error: "User with this email already exists"});
     }
 
-    const id = crypto.randomUUID();
-    const user: User = {
-        id,
-        name,
-        email
-    }
-
-    db.users.set(id, user);
-
+    const user = userService.create(req.body)
     res.status(201).json(user);
 }
