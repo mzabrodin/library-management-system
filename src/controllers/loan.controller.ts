@@ -25,11 +25,15 @@ export function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
         return res.status(404).json({error: "Book not found"});
     }
 
-    if (!book.available && !Array.from(db.loans.values()).some(loan => loan.bookId === bookId && loan.status === "ACTIVE")) {
-        return res.status(400).json({error: "Book is not available for lending"});
-    } else {
-        console.log(`Book ${book.title} is marked as unavailable but has no active loans. Marking it as available`);
-        book.available = true;
+    if (!book.available) {
+        const hasActiveLoan = Array.from(db.loans.values())
+            .some(loan => loan.bookId === bookId && loan.status === "ACTIVE");
+
+        if (hasActiveLoan) {
+            return res.status(400).json({error: "Book is not available for lending"});
+        }
+
+        console.warn(`Book '${book.title}' is unavailable without active loans`);
     }
 
     const id = crypto.randomUUID();
@@ -37,7 +41,7 @@ export function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
         id,
         userId,
         bookId,
-        loanDate,
+        loanDate: loanDate || new Date(),
         returnDate: null,
         status: "ACTIVE"
     }
