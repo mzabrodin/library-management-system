@@ -10,7 +10,8 @@ export const LoanSchema = z.object({
 
     loanDate: z
         .date({error: "Loan date must be a valid date"})
-        .max(new Date(), {error: "Loan date cannot be in the future"}),
+        .max(new Date(), {error: "Loan date cannot be in the future"})
+        .optional(),
 
     returnDate: z
         .date({error: "Return date must be a valid date"})
@@ -18,7 +19,7 @@ export const LoanSchema = z.object({
         .nullable()
         .optional(),
 
-    status: loanStatusSchema.nullable().optional()
+    status: loanStatusSchema.optional()
 }).refine((data) => {
     if (!data.returnDate || !data.loanDate) {
         return true;
