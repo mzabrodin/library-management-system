@@ -50,12 +50,7 @@ export class JsonStorage<T extends Identifiable> {
         this.data.set(item.id, item);
     }
 
-    public deleteById(id: string): boolean {
-        const result = this.data.delete(id);
-        if (result) {
-            this.saveToFile();
-        }
-
-        return result;
+    public deleteFromMap(id: string): boolean {
+        return this.data.delete(id);
     }
 }
