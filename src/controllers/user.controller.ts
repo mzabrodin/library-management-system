@@ -1,5 +1,4 @@
 import {Request, Response} from 'express';
-import {UserDto} from "../schemas/user.schema";
 import {userService} from "../services/user.service";
 
 type UserParams = {
@@ -21,12 +20,12 @@ export async function getUserById(req: Request<UserParams>, res: Response) {
     res.status(200).json(user);
 }
 
-export async function createUser(req: Request<{}, {}, UserDto>, res: Response) {
-    const existsByEmail = await userService.existsByEmail(req.body.email);
-    if (existsByEmail) {
-        return res.status(400).json({error: "User with this email already exists"});
+export async function getCurrentUser(req: Request, res: Response) {
+    const user = await userService.findById(req.user!.id);
+
+    if (user == null) {
+        return res.status(404).json({error: "User not found"});
     }
 
-    const user = await userService.create(req.body)
-    res.status(201).json(user);
+    res.status(200).json(user);
 }
