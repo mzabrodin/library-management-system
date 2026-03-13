@@ -2,14 +2,22 @@ import {Request, Response} from 'express';
 import {LoanDto} from "../schemas/loan.schema";
 import {loanService} from "../services/loan.service";
 import {bookService} from "../services/book.service";
-import {LoanStatus} from "../generated/prisma/enums";
+import {LoanStatus, UserRole} from "../generated/prisma/enums";
 
 type LoanParams = {
     id: string;
 }
 
-export async function getAllLoans(_: Request, res: Response) {
-    const loans = await loanService.findAll();
+export async function getAllLoans(req: Request, res: Response) {
+    const user = req.user!;
+    let loans;
+
+    if (user.role === UserRole.ADMIN) {
+        loans = await loanService.findAll();
+    } else {
+        loans = await loanService.findByUserId(user.id);
+    }
+
     res.status(200).json(loans);
 }
 
