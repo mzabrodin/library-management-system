@@ -1,4 +1,3 @@
-import {LoanDto} from "../schemas/loan.schema";
 import {prisma} from "../db/prisma";
 import {Loan, LoanStatus} from "../generated/prisma/client";
 
@@ -8,62 +7,38 @@ export class LoanService {
     }
 
     async findById(id: string): Promise<Loan | null> {
-        return prisma.loan.findUnique({
-            where: {id}
-        })
+        return prisma.loan.findUnique({where: {id}})
     }
 
     async existsActiveLoanForBook(bookId: string): Promise<boolean> {
-        const activeLoan = await prisma.loan.findFirst({
-            where: {
-                bookId: bookId,
-                status: LoanStatus.ACTIVE
-            }
-        });
-        return activeLoan !== null;
+        const count = await prisma.loan.count({where: {bookId: bookId, status: LoanStatus.ACTIVE}});
+        return count > 0;
     }
 
-    async loan(dto: LoanDto): Promise<Loan> {
+    async loan(userId: string, bookId: string, loadDate: Date): Promise<Loan> {
         return prisma.$transaction(async (transaction) => {
             const newLoan = await transaction.loan.create({
                 data: {
-                    userId: dto.userId,
-                    bookId: dto.bookId,
-                    loanDate: dto.loanDate,
+                    userId: userId,
+                    bookId: bookId,
+                    loanDate: loadDate || new Date(),
                     status: LoanStatus.ACTIVE
                 }
             });
 
-            await transaction.book.update({
-                where: {id: dto.bookId},
-                data: {available: false}
-            });
-
+            await transaction.book.update({where: {id: bookId}, data: {available: false}});
             return newLoan;
         });
     }
 
-    async return(loanId: string): Promise<Loan> {
+    async return(loanId: string, bookId: string): Promise<Loan> {
         return prisma.$transaction(async (transaction) => {
-            const currentLoan = await transaction.loan.findUnique({
-                where: {id: loanId}
-            });
-
-            if (currentLoan == null) throw new Error("Loan not found");
-
             const updatedLoan = await transaction.loan.update({
                 where: {id: loanId},
-                data: {
-                    returnDate: new Date(),
-                    status: LoanStatus.RETURNED
-                }
+                data: {returnDate: new Date(), status: LoanStatus.RETURNED}
             });
 
-            await transaction.book.update({
-                where: {id: currentLoan.bookId},
-                data: {available: true}
-            });
-
+            await transaction.book.update({where: {id: bookId}, data: {available: true}});
             return updatedLoan;
         });
     }

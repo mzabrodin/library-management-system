@@ -1,4 +1,4 @@
-import {UserDto} from "../schemas/user.schema";
+import {RegisterDto} from "../schemas/user.schema";
 import {prisma} from "../db/prisma";
 import bcrypt from "bcrypt";
 import {User, UserRole} from "../generated/prisma/client";
@@ -28,36 +28,32 @@ export class UserService {
         });
     }
 
-    async existsByEmail(email: string): Promise<boolean> {
-        const user = await prisma.user.findUnique({
-            where: {email: email.toLowerCase()}
-        });
-
-        return user !== null;
+    async findByEmail(email: string): Promise<User | null> {
+        return prisma.user.findUnique({where: {email}})
     }
 
-    async existsById(id: string): Promise<boolean> {
-        const count = await prisma.user.count({
-            where: {id}
-        });
-
+    async existsByEmail(email: string): Promise<boolean> {
+        const count = await prisma.user.count({where: {email}});
         return count > 0;
     }
 
-    async create(dto: UserDto): Promise<Omit<User, 'passwordHash'>> {
+    async create(dto: RegisterDto): Promise<Omit<User, 'passwordHash'>> {
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-        const newUser = await prisma.user.create({
+        return prisma.user.create({
             data: {
                 name: dto.name,
                 email: dto.email,
                 passwordHash: hashedPassword,
                 role: dto.role || UserRole.USER
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
             }
         });
-
-        const {passwordHash, ...userWithoutPassword} = newUser;
-        return userWithoutPassword;
     }
 }
 
