@@ -1,48 +1,71 @@
-import {db} from "../storage/db";
 import {Book, Loan, User} from "../types";
 import {LoanDto} from "../schemas/loan.schema";
+import {prisma} from "../storage/db";
 
 export class LoanService {
-    findAll(): Loan[] {
-        return db.loans.getAll();
+    async findAll(): Promise<Loan[]> {
+        return prisma.loan.findMany();
     }
 
-    findById(id: string): Loan | undefined {
-        return db.loans.getById(id);
+    async findById(id: string): Promise<Loan | null> {
+        return prisma.loan.findUnique({
+            where: {id}
+        })
     }
 
-    existsActiveLoanForBook(bookId: string): boolean {
-        return this.findAll().some(loan => loan.bookId === bookId && loan.status === "ACTIVE");
+    async existsActiveLoanForBook(bookId: string): Promise<boolean> {
+        const activeLoan = await prisma.loan.findFirst({
+            where: {
+                bookId: bookId,
+                status: "ACTIVE"
+            }
+        });
+        return activeLoan !== null;
     }
 
-    loan(dto: LoanDto, user: User, book: Book): Loan {
-        const id = crypto.randomUUID();
-        const loan: Loan = {
-            id,
-            userId: user.id,
-            bookId: book.id,
-            loanDate: dto.loanDate || new Date(),
-            returnDate: dto.returnDate || null,
-            status: "ACTIVE"
-        }
+    async loan(dto: LoanDto): Promise<Loan> {
+        return prisma.$transaction(async (tx) => {
+            const newLoan = await tx.loan.create({
+                data: {
+                    userId: dto.userId,
+                    bookId: dto.bookId,
+                    loanDate: dto.loanDate || new Date(),
+                    status: "ACTIVE"
+                }
+            });
 
-        db.loans.saveToMap(loan);
-        db.loans.saveToFile();
+            await tx.book.update({
+                where: {id: dto.bookId},
+                data: {available: false}
+            });
 
-        return loan;
+            return newLoan;
+        });
     }
 
-    return(loan: Loan): Loan {
-        const updatedLoan: Loan = {
-            ...loan,
-            returnDate: new Date(),
-            status: "RETURNED"
-        }
+    async return(loanId: string): Promise<Loan> {
+        return prisma.$transaction(async (transaction) => {
+            const currentLoan = await transaction.loan.findUnique({
+                where: {id: loanId}
+            });
 
-        db.loans.saveToMap(updatedLoan);
-        db.loans.saveToFile();
+            if (!currentLoan) throw new Error("Loan not found");
 
-        return updatedLoan;
+            const updatedLoan = await transaction.loan.update({
+                where: {id: loanId},
+                data: {
+                    returnDate: new Date(),
+                    status: "RETURNED"
+                }
+            });
+
+            await transaction.book.update({
+                where: {id: currentLoan.bookId},
+                data: {available: true}
+            });
+
+            return updatedLoan;
+        });
     }
 }
 

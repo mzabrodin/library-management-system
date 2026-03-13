@@ -1,37 +1,69 @@
-import {db} from "../storage/db";
 import {User} from "../types";
 import {UserDto} from "../schemas/user.schema";
+import {prisma} from "../storage/db";
+import bcrypt from "bcrypt";
 
 export class UserService {
 
-    findAll(): User[] {
-        return db.users.getAll();
+    async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
+        return prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+            }
+        });
     }
 
-    findById(id: string): User | undefined {
-        return db.users.getById(id);
+    async findById(id: string): Promise<Omit<User, 'passwordHash'> | null> {
+        return prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+            }
+        });
     }
 
-    existsByEmail(email: string): boolean {
-        return db.users.getAll().some(user => user.email === email);
+    async findByEmailWithPassword(email: string): Promise<User | null> {
+        return prisma.user.findUnique({
+            where: { email: email.toLowerCase() }
+        });
     }
 
-    existsById(id: string): boolean {
-        return this.findById(id) !== undefined;
+    async existsByEmail(email: string): Promise<boolean> {
+        const user = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() }
+        });
+
+        return user !== null;
     }
 
-    create(dto: UserDto): User {
-        const id = crypto.randomUUID();
-        const user: User = {
-            id,
-            name: dto.name,
-            email: dto.email
-        }
+    async existsById(id: string): Promise<boolean> {
+        const count = await prisma.user.count({
+            where: { id }
+        });
 
-        db.users.saveToMap(user);
-        db.users.saveToFile()
+        return count > 0;
+    }
 
-        return user;
+    async create(dto: UserDto): Promise<Omit<User, 'passwordHash'>> {
+        const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+        const newUser = await prisma.user.create({
+            data: {
+                name: dto.name,
+                email: dto.email.toLowerCase(),
+                passwordHash: hashedPassword,
+                role: dto.role || "USER"
+            }
+        });
+
+        const { passwordHash, ...userWithoutPassword } = newUser;
+        return userWithoutPassword;
     }
 }
 

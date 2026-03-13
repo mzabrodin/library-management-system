@@ -1,74 +1,63 @@
-import {db} from "../storage/db";
 import {Book} from "../types";
 import {CreateBookDto, UpdateBookDto} from "../schemas/book.schema";
+import {prisma} from "../storage/db";
 
 export class BookService {
-    findAll(): Book[] {
-        return db.books.getAll();
+    async findAll(): Promise<Book[]> {
+        return prisma.book.findMany();
     }
 
-    findById(id: string): Book | undefined {
-        return db.books.getById(id);
+    async findById(id: string): Promise<Book | null> {
+        return prisma.book.findUnique({
+            where: {id}
+        });
     }
 
-    existsById(id: string): boolean {
-        return db.books.getById(id) !== undefined;
+    async existsById(id: string): Promise<boolean> {
+        const count = await prisma.book.count({
+            where: {id}
+        });
+        return count > 0;
     }
 
-    existsByIsbn(isbn: string): boolean {
-        return db.books.getAll().some(book => book.isbn === isbn);
+    async existsByIsbn(isbn: string): Promise<boolean> {
+        const book = await prisma.book.findUnique({
+            where: {isbn}
+        });
+        return book !== null;
     }
 
-    changeAvailability(book: Book, available: boolean): Book {
-        const updatedBook: Book = {
-            ...book,
-            available: available
-        }
-
-        db.books.saveToMap(updatedBook);
-        db.books.saveToFile();
-
-        return updatedBook;
+    async changeAvailability(id: string, available: boolean): Promise<Book> {
+        return prisma.book.update({
+            where: {id},
+            data: {available}
+        });
     }
 
-    create(dto: CreateBookDto): Book {
-        const id = crypto.randomUUID();
-        const book: Book = {
-            id,
-            title: dto.title,
-            author: dto.author,
-            year: dto.year,
-            isbn: dto.isbn,
-            available: dto.available
-        }
-
-        db.books.saveToMap(book);
-        db.books.saveToFile();
-
-        return book;
+    async create(dto: CreateBookDto): Promise<Book> {
+        return prisma.book.create({
+            data: {
+                title: dto.title,
+                author: dto.author,
+                year: dto.year,
+                isbn: dto.isbn,
+                available: dto.available ?? true
+            }
+        });
     }
 
-    update(id: string, dto: UpdateBookDto): Book {
-        const book = db.books.getById(id)!;
-
-        const updatedBook: Book = {
-            ...book,
-            ...dto
-        }
-
-        db.books.saveToMap(updatedBook);
-        db.books.saveToFile();
-
-        return updatedBook;
+    async update(id: string, dto: UpdateBookDto): Promise<Book> {
+        return prisma.book.update({
+            where: {id},
+            data: dto
+        });
     }
 
-    delete(id: string) {
-        const result = db.books.deleteFromMap(id);
-        db.books.saveToFile();
-
-        return result;
+    async delete(id: string): Promise<Book> {
+        return prisma.book.delete({
+            where: {id}
+        });
     }
-
 }
 
 export const bookService = new BookService();
