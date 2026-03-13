@@ -6,6 +6,12 @@ export class LoanService {
         return prisma.loan.findMany();
     }
 
+    async findByUserId(userId: string): Promise<Loan[]> {
+        return prisma.loan.findMany({
+            where: { userId }
+        });
+    }
+
     async findById(id: string): Promise<Loan | null> {
         return prisma.loan.findUnique({where: {id}})
     }

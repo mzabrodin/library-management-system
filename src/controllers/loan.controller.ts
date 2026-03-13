@@ -1,8 +1,8 @@
 import {Request, Response} from 'express';
 import {LoanDto} from "../schemas/loan.schema";
 import {loanService} from "../services/loan.service";
-import {userService} from "../services/user.service";
 import {bookService} from "../services/book.service";
+import {LoanStatus} from "../generated/prisma/enums";
 
 type LoanParams = {
     id: string;
@@ -14,10 +14,7 @@ export async function getAllLoans(_: Request, res: Response) {
 }
 
 export async function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
-    const user = await userService.findById(req.body.userId);
-    if (user == null) {
-        return res.status(404).json({error: "User not found"});
-    }
+    const userId = req.user!.id;
 
     const book = await bookService.findById(req.body.bookId);
     if (book == null) {
@@ -33,7 +30,7 @@ export async function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
         console.warn(`Book '${book.title}' is unavailable without active loans`);
     }
 
-    const loan = await loanService.loan(req.body);
+    const loan = await loanService.loan(userId, req.body.bookId, req.body.loanDate);
     res.status(201).json(loan);
 }
 
@@ -43,15 +40,10 @@ export async function returnBook(req: Request<LoanParams>, res: Response) {
         return res.status(404).json({error: "Loan not found"});
     }
 
-    if (loan.status === "RETURNED") {
+    if (loan.status === LoanStatus.RETURNED) {
         return res.status(400).json({error: "Book has already been returned"});
     }
 
-    const book = await bookService.findById(loan.bookId);
-    if (!book) {
-        return res.status(404).json({error: "Book not found"});
-    }
-
-    const updatedLoan = await loanService.return(loan.id);
+    const updatedLoan = await loanService.return(loan.id, loan.bookId);
     res.status(200).json(updatedLoan);
 }
