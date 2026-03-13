@@ -6,43 +6,56 @@ type BookParams = {
     id: string;
 }
 
-export function getAllBooks(_: Request, res: Response) {
-    res.status(200).json(bookService.findAll());
+export async function getAllBooks(_: Request, res: Response) {
+    const books = await bookService.findAll();
+    res.status(200).json(books);
 }
 
-export function getBookById(req: Request<BookParams>, res: Response) {
-    const book = bookService.findById(req.params.id);
-
-    if (!book) {
+export async function getBookById(req: Request<BookParams>, res: Response) {
+    const book = await bookService.findById(req.params.id);
+    if (book == null) {
         return res.status(404).json({error: "Book not found"});
     }
 
     res.status(200).json(book);
 }
 
-export function createBook(req: Request<{}, {}, CreateBookDto>, res: Response) {
-    if (bookService.existsByIsbn(req.body.isbn)) {
+export async function createBook(req: Request<{}, {}, CreateBookDto>, res: Response) {
+    const existsByIsbn = await bookService.existsByIsbn(req.body.isbn);
+    if (existsByIsbn) {
         return res.status(400).json({error: "Book with this ISBN already exists"});
     }
 
-    const book = bookService.create(req.body)
+    const book = await bookService.create(req.body);
     res.status(201).json(book);
 }
 
-export function updateBook(req: Request<BookParams, {}, UpdateBookDto>, res: Response) {
-    if (!bookService.existsById(req.params.id)) {
+export async function updateBook(req: Request<BookParams, {}, UpdateBookDto>, res: Response) {
+    const existsById = await bookService.existsById(req.params.id);
+    if (!existsById) {
         return res.status(404).json({error: "Book not found"});
     }
 
-    if (req.body.isbn && bookService.existsByIsbn(req.body.isbn)) {
-        return res.status(400).json({error: "Book with this ISBN already exists"});
+    if (req.body.isbn) {
+        const bookWithIsbn = await bookService.findByIsbn(req.body.isbn);
+
+        if (bookWithIsbn && bookWithIsbn.id !== req.params.id) {
+            return res.status(400).json({error: "Book with this ISBN already exists"});
+        }
     }
 
-    const updatedBook = bookService.update(req.params.id, req.body);
+    const updatedBook = await bookService.update(req.params.id, req.body);
     res.status(200).json(updatedBook);
+
 }
 
-export function deleteBook(req: Request<BookParams>, res: Response) {
-    bookService.delete(req.params.id)
+export async function deleteBook(req: Request<BookParams>, res: Response) {
+    const exists = await bookService.existsById(req.params.id);
+    if (!exists) {
+        return res.status(404).json({error: "Book not found"});
+    }
+
+    await bookService.delete(req.params.id);
     res.status(204).send();
+
 }
