@@ -3,7 +3,7 @@ import * as z from 'zod';
 // Regular Expressions to Validate password from https://stackoverflow.com/a/21456918
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-export const UserRole = z.enum(["USER", "ADMIN"], {error: "Role must be either 'USER' or 'ADMIN'"});
+export const userRoleSchema = z.enum(["USER", "ADMIN"], {error: "Role must be either 'USER' or 'ADMIN'"});
 
 export const userSchema = z.object({
     name: z
@@ -20,7 +20,8 @@ export const userSchema = z.object({
         .max(100, {error: "Password must be less than 100 characters"})
         .regex(passwordRegex, {error:"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
 
-    role: UserRole.default("USER")
+    role: userRoleSchema.default("USER")
 });
 
 export type UserDto = z.infer<typeof userSchema>;
+export type UserRole = z.infer<typeof userRoleSchema>;
