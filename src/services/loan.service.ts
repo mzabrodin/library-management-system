@@ -24,8 +24,8 @@ export class LoanService {
     }
 
     async loan(dto: LoanDto): Promise<Loan> {
-        return prisma.$transaction(async (tx) => {
-            const newLoan = await tx.loan.create({
+        return prisma.$transaction(async (transaction) => {
+            const newLoan = await transaction.loan.create({
                 data: {
                     userId: dto.userId,
                     bookId: dto.bookId,
@@ -34,7 +34,7 @@ export class LoanService {
                 }
             });
 
-            await tx.book.update({
+            await transaction.book.update({
                 where: {id: dto.bookId},
                 data: {available: false}
             });
