@@ -1,6 +1,6 @@
-import {Book} from "../types";
 import {CreateBookDto, UpdateBookDto} from "../schemas/book.schema";
 import {prisma} from "../db/prisma";
+import {Book} from "../generated/prisma/client";
 
 export class BookService {
     async findAll(): Promise<Book[]> {
@@ -21,7 +21,7 @@ export class BookService {
     }
 
     async findByIsbn(isbn: string): Promise<Book | null> {
-        return prisma.book.findUnique({ where: { isbn } });
+        return prisma.book.findUnique({where: {isbn}});
     }
 
     async existsByIsbn(isbn: string): Promise<boolean> {
@@ -31,13 +31,6 @@ export class BookService {
         return book !== null;
     }
 
-    async changeAvailability(id: string, available: boolean): Promise<Book> {
-        return prisma.book.update({
-            where: {id},
-            data: {available}
-        });
-    }
-
     async create(dto: CreateBookDto): Promise<Book> {
         return prisma.book.create({
             data: {
@@ -45,7 +38,7 @@ export class BookService {
                 author: dto.author,
                 year: dto.year,
                 isbn: dto.isbn,
-                available: dto.available ?? true
+                available: dto.available
             }
         });
     }

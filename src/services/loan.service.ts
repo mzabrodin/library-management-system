@@ -1,6 +1,6 @@
-import {Book, Loan, User} from "../types";
 import {LoanDto} from "../schemas/loan.schema";
 import {prisma} from "../db/prisma";
+import {Loan, LoanStatus} from "../generated/prisma/client";
 
 export class LoanService {
     async findAll(): Promise<Loan[]> {
@@ -17,7 +17,7 @@ export class LoanService {
         const activeLoan = await prisma.loan.findFirst({
             where: {
                 bookId: bookId,
-                status: "ACTIVE"
+                status: LoanStatus.ACTIVE
             }
         });
         return activeLoan !== null;
@@ -29,8 +29,8 @@ export class LoanService {
                 data: {
                     userId: dto.userId,
                     bookId: dto.bookId,
-                    loanDate: dto.loanDate || new Date(),
-                    status: "ACTIVE"
+                    loanDate: dto.loanDate,
+                    status: LoanStatus.ACTIVE
                 }
             });
 
@@ -49,13 +49,13 @@ export class LoanService {
                 where: {id: loanId}
             });
 
-            if (!currentLoan) throw new Error("Loan not found");
+            if (currentLoan == null) throw new Error("Loan not found");
 
             const updatedLoan = await transaction.loan.update({
                 where: {id: loanId},
                 data: {
                     returnDate: new Date(),
-                    status: "RETURNED"
+                    status: LoanStatus.RETURNED
                 }
             });
 
