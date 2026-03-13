@@ -24,4 +24,3 @@ export const userSchema = z.object({
 });
 
 export type UserDto = z.infer<typeof userSchema>;
-export type UserRole = z.infer<typeof userRoleSchema>;

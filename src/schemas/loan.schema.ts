@@ -34,4 +34,3 @@ export const LoanSchema = z.object({
 });
 
 export type LoanDto = z.infer<typeof LoanSchema>;
-export type LoanStatus = z.infer<typeof loanStatusSchema>;
