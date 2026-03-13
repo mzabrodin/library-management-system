@@ -5,7 +5,7 @@ import {User, UserRole} from "../generated/prisma/client";
 
 export class UserService {
 
-    async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
+    async findAll(): Promise<Omit<User, 'passwordHash' | 'refreshToken'>[]> {
         return prisma.user.findMany({
             select: {
                 id: true,
@@ -16,7 +16,7 @@ export class UserService {
         });
     }
 
-    async findById(id: string): Promise<Omit<User, 'passwordHash'> | null> {
+    async findById(id: string): Promise<Omit<User, 'passwordHash' | 'refreshToken'> | null> {
         return prisma.user.findUnique({
             where: {id},
             select: {
@@ -37,7 +37,7 @@ export class UserService {
         return count > 0;
     }
 
-    async create(dto: RegisterDto): Promise<Omit<User, 'passwordHash'>> {
+    async create(dto: RegisterDto): Promise<Omit<User, 'passwordHash' | 'refreshToken'>> {
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 
         return prisma.user.create({
