@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import type {Request, Response, NextFunction} from "express";
 import JWT from "../types/jwt";
 import CONFIG from "../config";
+import {UserRole} from "../generated/prisma/enums";
 
 export function authenticateJWT(req: Request, res: Response, next: NextFunction) {
     const {authorization} = req.headers;
@@ -42,7 +43,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
         return res.status(401).json({error: "Access denied. Please login first"});
     }
 
-    if (req.user.role !== "ADMIN") {
+    if (req.user.role !== UserRole.ADMIN) {
         return res.status(403).json({error: "Access denied. Admin privileges required"});
     }
 
