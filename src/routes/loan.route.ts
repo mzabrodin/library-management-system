@@ -10,6 +10,6 @@ router.get("/", authenticateJWT, LoanController.getAllLoans);
 
 router.post("/", authenticateJWT, validate(LoanSchema), LoanController.lendBook);
 
-router.post("/:id/return", authenticateJWT, requireAdmin, LoanController.returnBook);
+router.post("/:id/return", authenticateJWT, LoanController.returnBook);
 
 export default router;
