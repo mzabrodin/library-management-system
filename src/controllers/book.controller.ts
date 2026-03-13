@@ -39,7 +39,7 @@ export async function updateBook(req: Request<BookParams, {}, UpdateBookDto>, re
     if (req.body.isbn) {
         const bookWithIsbn = await bookService.findByIsbn(req.body.isbn);
 
-        if (bookWithIsbn && bookWithIsbn.id !== req.params.id) {
+        if (bookWithIsbn != null && bookWithIsbn.id !== req.params.id) {
             return res.status(400).json({error: "Book with this ISBN already exists"});
         }
     }
