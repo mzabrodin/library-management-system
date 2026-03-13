@@ -1,4 +1,5 @@
 import {LoanStatus} from "../schemas/loan.schema";
+import {UserRole} from "../schemas/user.schema";
 
 export interface Identifiable {
     id: string
@@ -14,7 +15,9 @@ export type Book = Identifiable & {
 
 export type User = Identifiable & {
     name: string,
-    email: string
+    email: string,
+    passwordHash: string,
+    role: UserRole
 };
 
 export type Loan = Identifiable & {
