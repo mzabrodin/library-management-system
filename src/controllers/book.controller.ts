@@ -46,16 +46,14 @@ export async function updateBook(req: Request<BookParams, {}, UpdateBookDto>, re
 
     const updatedBook = await bookService.update(req.params.id, req.body);
     res.status(200).json(updatedBook);
-
 }
 
 export async function deleteBook(req: Request<BookParams>, res: Response) {
-    const exists = await bookService.existsById(req.params.id);
-    if (!exists) {
+    const existsById = await bookService.existsById(req.params.id);
+    if (!existsById) {
         return res.status(404).json({error: "Book not found"});
     }
 
     await bookService.delete(req.params.id);
     res.status(204).send();
-
 }
