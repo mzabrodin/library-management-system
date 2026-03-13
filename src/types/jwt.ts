@@ -7,4 +7,12 @@ interface JWT extends JwtPayload {
     role: UserRole;
 }
 
+declare global {
+    namespace Express {
+        interface Request {
+            user?: JWT;
+        }
+    }
+}
+
 export default JWT;
