@@ -6,25 +6,27 @@ type UserParams = {
     id: string;
 }
 
-export function getAllUsers(_: Request, res: Response) {
-    res.status(200).json(userService.findAll());
+export async function getAllUsers(_: Request, res: Response) {
+    const users = await userService.findAll();
+    return res.status(200).json(users);
 }
 
-export function getUserById(req: Request<UserParams>, res: Response) {
-    const user = userService.findById(req.params.id);
+export async function getUserById(req: Request<UserParams>, res: Response) {
+    const user = await userService.findById(req.params.id);
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).json({error: "User not found"});
     }
 
     res.status(200).json(user);
 }
 
-export function createUser(req: Request<{}, {}, UserDto>, res: Response) {
-    if (userService.existsByEmail(req.body.email)) {
+export async function createUser(req: Request<{}, {}, UserDto>, res: Response) {
+    const existsByEmail = await userService.existsByEmail(req.body.email);
+    if (existsByEmail) {
         return res.status(400).json({error: "User with this email already exists"});
     }
 
-    const user = userService.create(req.body)
+    const user = await userService.create(req.body)
     res.status(201).json(user);
 }
