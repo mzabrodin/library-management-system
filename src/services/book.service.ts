@@ -20,6 +20,10 @@ export class BookService {
         return count > 0;
     }
 
+    async findByIsbn(isbn: string): Promise<Book | null> {
+        return prisma.book.findUnique({ where: { isbn } });
+    }
+
     async existsByIsbn(isbn: string): Promise<boolean> {
         const book = await prisma.book.findUnique({
             where: {isbn}
