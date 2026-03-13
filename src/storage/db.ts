@@ -1,8 +1,8 @@
-import {Book, Loan, User} from "../types";
-import {JsonStorage} from "./json-storage";
+import "dotenv/config";
+import {PrismaPg} from "@prisma/adapter-pg";
+import {PrismaClient} from "../generated/prisma/client";
 
-export const db = {
-    books: new JsonStorage<Book>('books'),
-    users: new JsonStorage<User>('users'),
-    loans: new JsonStorage<Loan>('loans'),
-};
+const connectionString = `${process.env.DATABASE_URL}`;
+
+const adapter = new PrismaPg({connectionString});
+export const prisma = new PrismaClient({adapter});
