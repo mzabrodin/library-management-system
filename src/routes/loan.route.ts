@@ -2,13 +2,14 @@ import express from "express";
 import {validate} from "../middleware/validate.middleware";
 import {LoanSchema} from "../schemas/loan.schema";
 import * as LoanController from "../controllers/loan.controller";
+import {authenticateJWT, requireAdmin} from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.get("/", LoanController.getAllLoans);
+router.get("/", authenticateJWT, LoanController.getAllLoans);
 
-router.post("/", validate(LoanSchema), LoanController.lendBook);
+router.post("/", authenticateJWT, validate(LoanSchema), LoanController.lendBook);
 
-router.post("/:id/return", LoanController.returnBook);
+router.post("/:id/return", authenticateJWT, requireAdmin, LoanController.returnBook);
 
 export default router;
