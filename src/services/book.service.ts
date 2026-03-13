@@ -8,27 +8,17 @@ export class BookService {
     }
 
     async findById(id: string): Promise<Book | null> {
-        return prisma.book.findUnique({
-            where: {id}
-        });
+        return prisma.book.findUnique({where: {id}});
     }
 
     async existsById(id: string): Promise<boolean> {
-        const count = await prisma.book.count({
-            where: {id}
-        });
+        const count = await prisma.book.count({where: {id}});
         return count > 0;
     }
 
-    async findByIsbn(isbn: string): Promise<Book | null> {
-        return prisma.book.findUnique({where: {isbn}});
-    }
-
     async existsByIsbn(isbn: string): Promise<boolean> {
-        const book = await prisma.book.findUnique({
-            where: {isbn}
-        });
-        return book !== null;
+        const count = await prisma.book.count({where: {isbn}});
+        return count > 0;
     }
 
     async create(dto: CreateBookDto): Promise<Book> {
@@ -44,16 +34,11 @@ export class BookService {
     }
 
     async update(id: string, dto: UpdateBookDto): Promise<Book> {
-        return prisma.book.update({
-            where: {id},
-            data: dto
-        });
+        return prisma.book.update({where: {id}, data: dto});
     }
 
     async delete(id: string): Promise<Book> {
-        return prisma.book.delete({
-            where: {id}
-        });
+        return prisma.book.delete({where: {id}});
     }
 }
 

@@ -31,15 +31,14 @@ export async function createBook(req: Request<{}, {}, CreateBookDto>, res: Respo
 }
 
 export async function updateBook(req: Request<BookParams, {}, UpdateBookDto>, res: Response) {
-    const existsById = await bookService.existsById(req.params.id);
-    if (!existsById) {
+    const existingBook = await bookService.findById(req.params.id);
+    if (!existingBook) {
         return res.status(404).json({error: "Book not found"});
     }
 
-    if (req.body.isbn) {
-        const bookWithIsbn = await bookService.findByIsbn(req.body.isbn);
-
-        if (bookWithIsbn != null && bookWithIsbn.id !== req.params.id) {
+    if (req.body.isbn && req.body.isbn !== existingBook.isbn) {
+        const existsByIsbn = await bookService.existsByIsbn(req.body.isbn);
+        if (existsByIsbn) {
             return res.status(400).json({error: "Book with this ISBN already exists"});
         }
     }
