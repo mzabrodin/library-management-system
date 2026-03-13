@@ -8,38 +8,38 @@ type LoanParams = {
     id: string;
 }
 
-export function getAllLoans(_: Request, res: Response) {
-    res.status(200).json(loanService.findAll());
+export async function getAllLoans(_: Request, res: Response) {
+    const loans = await loanService.findAll();
+    res.status(200).json(loans);
 }
 
-export function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
-    const user = userService.findById(req.body.userId);
-    if (!user) {
+export async function lendBook(req: Request<{}, {}, LoanDto>, res: Response) {
+    const user = await userService.findById(req.body.userId);
+    if (user == null) {
         return res.status(404).json({error: "User not found"});
     }
 
-    const book = bookService.findById(req.body.bookId);
-    if (!book) {
+    const book = await bookService.findById(req.body.bookId);
+    if (book == null) {
         return res.status(404).json({error: "Book not found"});
     }
 
     if (!book.available) {
-        if (loanService.existsActiveLoanForBook(book.id)) {
+        const hasActiveLoan = await loanService.existsActiveLoanForBook(book.id);
+        if (hasActiveLoan) {
             return res.status(400).json({error: "Book is not available for lending"});
         }
 
         console.warn(`Book '${book.title}' is unavailable without active loans`);
     }
 
-    const loan = loanService.loan(req.body, user, book);
-    bookService.changeAvailability(book, false);
-
+    const loan = await loanService.loan(req.body);
     res.status(201).json(loan);
 }
 
-export function returnBook(req: Request<LoanParams>, res: Response) {
-    const loan = loanService.findById(req.params.id);
-    if (!loan) {
+export async function returnBook(req: Request<LoanParams>, res: Response) {
+    const loan = await loanService.findById(req.params.id);
+    if (loan == null) {
         return res.status(404).json({error: "Loan not found"});
     }
 
@@ -47,13 +47,11 @@ export function returnBook(req: Request<LoanParams>, res: Response) {
         return res.status(400).json({error: "Book has already been returned"});
     }
 
-    const book = bookService.findById(loan.bookId);
+    const book = await bookService.findById(loan.bookId);
     if (!book) {
         return res.status(404).json({error: "Book not found"});
     }
 
-    const updatedLoan = loanService.return(loan);
-    bookService.changeAvailability(book, true);
-
+    const updatedLoan = await loanService.return(loan.id);
     res.status(200).json(updatedLoan);
 }
