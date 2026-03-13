@@ -1,5 +1,5 @@
 import express from "express";
-import {validate} from "../middleware/validate";
+import {validate} from "../middleware/validate.middleware";
 import {createBookSchema, updateBookSchema} from "../schemas/book.schema";
 import * as BookController from "../controllers/book.controller";
 

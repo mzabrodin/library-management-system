@@ -1,5 +1,5 @@
 import express from "express";
-import {validate} from "../middleware/validate";
+import {validate} from "../middleware/validate.middleware";
 import{userSchema} from "../schemas/user.schema";
 import * as UserController from "../controllers/user.controller";
 

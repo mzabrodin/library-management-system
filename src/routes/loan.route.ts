@@ -1,5 +1,5 @@
 import express from "express";
-import {validate} from "../middleware/validate";
+import {validate} from "../middleware/validate.middleware";
 import {LoanSchema} from "../schemas/loan.schema";
 import * as LoanController from "../controllers/loan.controller";
 
