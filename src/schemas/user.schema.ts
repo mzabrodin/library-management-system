@@ -5,7 +5,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$
 
 export const userRoleSchema = z.enum(["USER", "ADMIN"], {error: "Role must be either 'USER' or 'ADMIN'"});
 
-export const userSchema = z.object({
+export const registerSchema = z.object({
     name: z
         .string()
         .trim()
@@ -17,10 +17,16 @@ export const userSchema = z.object({
     password: z
         .string()
         .min(8, {error: "Password must be at least 8 characters"})
-        .max(100, {error: "Password must be less than 100 characters"})
-        .regex(passwordRegex, {error:"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
+        .regex(passwordRegex, {error: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
 
-    role: userRoleSchema.default("USER")
+    role: userRoleSchema.default("USER").optional(),
+});
+export const loginSchema = z.object({
+    email: z.email({error: "Invalid email address"}),
+
+    password: z
+        .string()
 });
 
-export type UserDto = z.infer<typeof userSchema>;
+export type RegisterDto = z.infer<typeof registerSchema>;
+export type LoginDto = z.infer<typeof loginSchema>;
