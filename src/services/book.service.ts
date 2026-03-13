@@ -1,6 +1,6 @@
 import {Book} from "../types";
 import {CreateBookDto, UpdateBookDto} from "../schemas/book.schema";
-import {prisma} from "../storage/db";
+import {prisma} from "../db/prisma";
 
 export class BookService {
     async findAll(): Promise<Book[]> {

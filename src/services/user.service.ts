@@ -1,6 +1,6 @@
 import {User} from "../types";
 import {UserDto} from "../schemas/user.schema";
-import {prisma} from "../storage/db";
+import {prisma} from "../db/prisma";
 import bcrypt from "bcrypt";
 
 export class UserService {

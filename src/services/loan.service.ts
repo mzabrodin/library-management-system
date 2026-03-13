@@ -1,6 +1,6 @@
 import {Book, Loan, User} from "../types";
 import {LoanDto} from "../schemas/loan.schema";
-import {prisma} from "../storage/db";
+import {prisma} from "../db/prisma";
 
 export class LoanService {
     async findAll(): Promise<Loan[]> {
