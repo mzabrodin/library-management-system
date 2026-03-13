@@ -28,7 +28,7 @@ export const createBookSchema = z.object({
         .min(1, {error: "ISBN is required"})
         .regex(isbnRegex, {error: "ISBN must be a valid format, digits and hyphens only"}),
 
-    available: z.boolean()
+    available: z.boolean().default(true)
 });
 
 export const updateBookSchema = createBookSchema.partial();

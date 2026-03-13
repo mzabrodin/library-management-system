@@ -9,19 +9,21 @@ export const LoanSchema = z.object({
     bookId: z.uuid({error: "Book ID must be a valid UUID"}),
 
     loanDate: z
+        .coerce
         .date({error: "Loan date must be a valid date"})
         .max(new Date(), {error: "Loan date cannot be in the future"})
-        .optional(),
+        .default(() => new Date()),
 
     returnDate: z
+        .coerce
         .date({error: "Return date must be a valid date"})
         .max(new Date(), {error: "Return date cannot be in the future"})
         .nullable()
         .optional(),
 
-    status: loanStatusSchema.optional()
+    status: loanStatusSchema.default("ACTIVE")
 }).refine((data) => {
-    if (!data.returnDate || !data.loanDate) {
+    if (!data.returnDate) {
         return true;
     }
 
