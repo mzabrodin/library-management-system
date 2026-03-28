@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {LoginDto, RegisterDto} from "../schemas/user.schema";
+import {LoginDto, RefreshDto, RegisterDto} from "../schemas/user.schema";
 import {userService} from "../services/user.service";
 import {authService} from "../services/auth.service";
 
@@ -30,12 +30,8 @@ export async function login(req: Request<{}, {}, LoginDto>, res: Response) {
     res.status(200).json(authData);
 }
 
-export async function refresh(req: Request, res: Response) {
+export async function refresh(req: Request<{}, {}, RefreshDto>, res: Response) {
     const {refreshToken} = req.body;
-
-    if (!refreshToken) {
-        return res.status(400).json({error: "Refresh token is required in request body"});
-    }
 
     const tokens = await authService.refresh(refreshToken);
 
